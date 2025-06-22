@@ -20,6 +20,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha               // ← import pour l’alpha
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.unit.dp
@@ -49,9 +50,9 @@ fun Quiz(
     }
 
     Column(
-        verticalArrangement   = Arrangement.Center,
-        horizontalAlignment   = Alignment.CenterHorizontally,
-        modifier              = modifier.padding(16.dp)
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier            = modifier.padding(16.dp)
     ) {
         if (isLoading) {
             CircularProgressIndicator()
@@ -63,12 +64,10 @@ fun Quiz(
         }
         if (question == null || correct == null || choices == null) return@Column
 
-        // En-tête
-        Text("FizzQuiz", style = MaterialTheme.typography.headlineMedium)
+        Text("Buzz", style = MaterialTheme.typography.headlineMedium)
         Text("Score : $score", modifier = Modifier.padding(vertical = 8.dp))
         Spacer(Modifier.height(24.dp))
 
-        // Question
         Text(
             text     = question!!.question.toUtf8(),
             style    = MaterialTheme.typography.bodyLarge,
@@ -93,18 +92,18 @@ fun Quiz(
             }
 
             BaseButton(
-                text           = choice.toUtf8(),
-                modifier       = Modifier
+                text            = choice.toUtf8(),
+                modifier        = Modifier
                     .fillMaxWidth()
                     .padding(bottom = 8.dp)
                     .graphicsLayer { this.alpha = alpha },
-                enabled        = (selected == null),
-                gradientColors = listOf(containerColor, containerColor),
-                textColor      = Color.Black,
-                cornerRadius   = 4.dp,
-                elevation      = 2.dp,
-                verticalPadding= 12.dp,
-                onClick        = {
+                enabled         = (selected == null),
+                gradientColors  = listOf(containerColor, containerColor),
+                textColor       = Color.Black,
+                cornerRadius    = 4.dp,
+                elevation       = 2.dp,
+                verticalPadding = 12.dp,
+                onClick         = {
                     if (selected == null) {
                         selected = choice
                         viewModel.checkAnswer(choice)
@@ -117,15 +116,17 @@ fun Quiz(
         if (selected != null) {
             Spacer(Modifier.height(24.dp))
             BaseButton(
-                text           = "Suivant",
-                modifier       = Modifier.fillMaxWidth(),
-                enabled        = canFetch,
-                gradientColors = listOf(Color.White, Color.White),
-                textColor      = Color.Black,
-                cornerRadius   = 4.dp,
-                elevation      = 2.dp,
-                verticalPadding= 12.dp,
-                onClick        = { questionCount++ }
+                text            = "Suivant",
+                modifier        = Modifier
+                    .fillMaxWidth()
+                    .alpha(if (canFetch) 1f else 0.8f),
+                enabled         = canFetch,
+                gradientColors  = listOf(Color.White, Color.White),
+                textColor       = Color.Black,
+                cornerRadius    = 4.dp,
+                elevation       = 2.dp,
+                verticalPadding = 12.dp,
+                onClick         = { questionCount++ }
             )
         }
     }

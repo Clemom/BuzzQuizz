@@ -1,8 +1,7 @@
 package clem.project.buzz.ui.components
 
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.Search
@@ -22,8 +21,9 @@ fun <T> BaseDropdown(
     toString: (T) -> String = { it.toString() }
 ) {
     var expanded by remember { mutableStateOf(false) }
-    var query    by remember { mutableStateOf("") }
+    var query by remember { mutableStateOf("") }
 
+    // Filtre selon la saisie
     val filtered = remember(query, options) {
         if (query.isBlank()) options
         else options.filter { toString(it).contains(query, ignoreCase = true) }
@@ -31,62 +31,45 @@ fun <T> BaseDropdown(
 
     ExposedDropdownMenuBox(
         expanded = expanded,
-        onExpandedChange = { expanded = it },
+        onExpandedChange = { expanded = !expanded },
         modifier = modifier.fillMaxWidth()
     ) {
+        // Champ texte éditable + icônes
         OutlinedTextField(
-            value           = if (expanded) query else selectedOption?.let(toString) ?: "",
-            onValueChange   = {
+            value = if (expanded) query else selectedOption?.let(toString) ?: "",
+            onValueChange = {
                 query = it
                 expanded = true
             },
-            modifier        = Modifier
+            modifier = Modifier
                 .fillMaxWidth()
-                .menuAnchor(),                            // ← ancre le menu sous ce TextField
-            label           = { Text(label) },
-            leadingIcon     = { Icon(Icons.Default.Search, contentDescription = null) },
-            trailingIcon    = {
-                IconButton(onClick = { expanded = !expanded }) {
-                    Icon(Icons.Default.ArrowDropDown, contentDescription = null)
-                }
+                .menuAnchor(),
+            label = { Text(label) },
+            leadingIcon = { Icon(Icons.Default.Search, contentDescription = null) },
+            trailingIcon = {
+                ExposedDropdownMenuDefaults.TrailingIcon(expanded)
             },
-            colors          = ExposedDropdownMenuDefaults.outlinedTextFieldColors(),
-            shape           = RoundedCornerShape(8.dp),
-            singleLine      = true
+            colors = ExposedDropdownMenuDefaults.outlinedTextFieldColors(),
+            singleLine = true
         )
 
+        // Menu déroulant standard Material3
         ExposedDropdownMenu(
-            expanded        = expanded,
-            onDismissRequest= { expanded = false },
-            modifier        = Modifier
+            expanded = expanded,
+            onDismissRequest = { expanded = false },
+            modifier = Modifier
                 .fillMaxWidth()
                 .heightIn(max = 200.dp)
         ) {
             filtered.forEach { option ->
-                val text = toString(option)
-                val isSel = option == selectedOption
-
                 DropdownMenuItem(
-                    text = {
-                        Text(
-                            text,
-                            color = if (isSel) MaterialTheme.colorScheme.primary
-                            else MaterialTheme.colorScheme.onSurface
-                        )
-                    },
+                    text = { Text(toString(option)) },
                     onClick = {
                         onOptionSelect(option)
-                        query = text
+                        query = toString(option)
                         expanded = false
-                    },
-                    modifier = Modifier
-                        .background(
-                            if (isSel) MaterialTheme.colorScheme.primary.copy(alpha = 0.1f)
-                            else MaterialTheme.colorScheme.surface
-                        )
-                        .padding(horizontal = 16.dp)
+                    }
                 )
-                if (option != filtered.last()) Divider()
             }
         }
     }

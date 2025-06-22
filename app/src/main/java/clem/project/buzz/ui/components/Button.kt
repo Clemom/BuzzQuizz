@@ -29,7 +29,6 @@ fun BaseButton(
     text: String,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
-    // Si vous voulez un gradient, sinon passez deux fois la même couleur
     gradientColors: List<Color> = listOf(
         MaterialTheme.colorScheme.primary,
         MaterialTheme.colorScheme.secondary
@@ -64,7 +63,7 @@ fun BaseButton(
             .clickable(
                 enabled = enabled,
                 interactionSource = interactionSource,
-                indication = ripple(),   // ← utilisation de la nouvelle API ripple() :contentReference[oaicite:0]{index=0}
+                indication = ripple(),
                 onClick = onClick
             ),
         contentAlignment = Alignment.Center
