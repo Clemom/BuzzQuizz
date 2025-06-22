@@ -37,12 +37,12 @@ fun Home(viewModel: HomeViewModel) {
             TopAppBar(
                 title = { Text("Buzz", color = Color.Black) },
                 navigationIcon = {
-                    IconButton(onClick = { /* settings */ }) {
+                    IconButton(onClick = {}) {
                         Icon(Icons.Filled.Settings, contentDescription = null)
                     }
                 },
                 actions = {
-                    IconButton(onClick = { /* leaderboard */ }) {
+                    IconButton(onClick = {}) {
                         Icon(Icons.Filled.EmojiEvents, contentDescription = null)
                     }
                 },

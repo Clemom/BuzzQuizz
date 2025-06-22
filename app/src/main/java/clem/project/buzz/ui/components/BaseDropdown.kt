@@ -1,11 +1,8 @@
 package clem.project.buzz.ui.components
 
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowDropDown
-import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
@@ -23,12 +20,6 @@ fun <T> BaseDropdown(
     toString: (T) -> String = { it.toString() }
 ) {
     var expanded by remember { mutableStateOf(false) }
-    var query by remember { mutableStateOf("") }
-
-    val filtered = remember(query, options) {
-        if (query.isBlank()) options
-        else options.filter { toString(it).contains(query, ignoreCase = true) }
-    }
 
     ExposedDropdownMenuBox(
         expanded = expanded,
@@ -36,37 +27,35 @@ fun <T> BaseDropdown(
         modifier = modifier.fillMaxWidth()
     ) {
         OutlinedTextField(
-            value = if (expanded) query else selectedOption?.let(toString) ?: "",
-            onValueChange = {
-                query = it
-                expanded = true
-            },
-            modifier = Modifier
-                .fillMaxWidth()
-                .menuAnchor(),
+            value = selectedOption?.let(toString) ?: "",
+            onValueChange = {},
+            readOnly = true,
             label = { Text(label) },
-            leadingIcon = { Icon(Icons.Default.Search, contentDescription = null) },
-            trailingIcon = { Icon(Icons.Default.ArrowDropDown, contentDescription = null) },
+            trailingIcon = {
+                ExposedDropdownMenuDefaults.TrailingIcon(expanded)
+            },
             colors = ExposedDropdownMenuDefaults.outlinedTextFieldColors(
                 focusedBorderColor   = Color.Black,
-                unfocusedBorderColor = Color.Black,
-                disabledBorderColor  = Color.Gray
+                unfocusedBorderColor = Color.Black
             ),
             shape = RoundedCornerShape(8.dp),
-            singleLine = true
+            modifier = Modifier
+                .menuAnchor()
+                .fillMaxWidth()
         )
 
         ExposedDropdownMenu(
             expanded = expanded,
             onDismissRequest = { expanded = false },
-            modifier = Modifier.fillMaxWidth().heightIn(max = 200.dp)
+            modifier = Modifier
+                .fillMaxWidth()
+                .heightIn(max = 240.dp)
         ) {
-            filtered.forEach { option ->
+            options.forEach { option ->
                 DropdownMenuItem(
                     text = { Text(toString(option), color = Color.Black) },
                     onClick = {
                         onOptionSelect(option)
-                        query = toString(option)
                         expanded = false
                     }
                 )

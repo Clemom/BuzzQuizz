@@ -69,6 +69,8 @@ dependencies {
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.material3)
     implementation("androidx.compose.material:material-icons-extended")
+    implementation("androidx.activity:activity-compose:1.7.0")
+
 
 
     implementation("androidx.room:room-runtime:2.5.2")

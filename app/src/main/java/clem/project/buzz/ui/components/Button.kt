@@ -17,7 +17,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.draw.alpha
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -28,6 +27,8 @@ fun BaseButton(
     text: String,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
+    backgroundColor: Color = MaterialTheme.colorScheme.surface,
+    contentColor:    Color = MaterialTheme.colorScheme.onSurface,
     cornerRadius: Dp = 12.dp,
     elevation: Dp = 4.dp,
     verticalPadding: Dp = 12.dp,
@@ -44,7 +45,7 @@ fun BaseButton(
             .alpha(if (enabled) alphaPress else 0.5f)
             .shadow(elevation, RoundedCornerShape(cornerRadius), clip = false)
             .background(
-                color = MaterialTheme.colorScheme.surface,
+                color = backgroundColor,
                 shape = RoundedCornerShape(cornerRadius)
             )
             .clickable(
@@ -57,7 +58,7 @@ fun BaseButton(
     ) {
         Text(
             text = text,
-            color = MaterialTheme.colorScheme.onSurface,
+            color = contentColor,
             fontSize = 16.sp
         )
     }
