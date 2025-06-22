@@ -2,7 +2,7 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
-    id("kotlin-kapt")
+    kotlin("kapt")
 }
 
 android {
@@ -70,6 +70,7 @@ dependencies {
     implementation(libs.androidx.material3)
     implementation("androidx.compose.material:material-icons-extended")
     implementation("androidx.activity:activity-compose:1.7.0")
+    implementation ("androidx.lifecycle:lifecycle-viewmodel-compose:2.6.1")
 
 
 

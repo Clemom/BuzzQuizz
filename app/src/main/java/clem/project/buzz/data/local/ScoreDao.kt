@@ -9,12 +9,12 @@ import kotlinx.coroutines.flow.Flow
 interface ScoreDao {
     @Query("""
     SELECT *
-    FROM scores
+      FROM scores
     ORDER BY value DESC, timestamp ASC
     LIMIT :limit
   """)
     fun topScores(limit: Int): Flow<List<Score>>
 
     @Insert
-    suspend fun insert(score: Score)
+    fun insert(score: Score): Long
 }
