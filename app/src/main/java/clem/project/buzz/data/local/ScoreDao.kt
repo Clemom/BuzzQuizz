@@ -7,14 +7,15 @@ import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface ScoreDao {
+
     @Query("""
-    SELECT *
-      FROM scores
-    ORDER BY value DESC, timestamp ASC
-    LIMIT :limit
-  """)
+        SELECT *
+        FROM scores
+        ORDER BY value DESC, timestamp ASC
+        LIMIT :limit
+    """)
     fun topScores(limit: Int): Flow<List<Score>>
 
     @Insert
-    fun insert(score: Score): Long
+    suspend fun insert(score: Score)
 }

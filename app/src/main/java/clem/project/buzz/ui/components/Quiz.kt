@@ -1,3 +1,4 @@
+// Quiz.kt
 package clem.project.buzz.ui.components
 
 import android.app.Activity
@@ -13,10 +14,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import clem.project.buzz.data.local.AppDatabase
+import clem.project.buzz.data.local.Score
 import clem.project.buzz.ui.theme.BWWhite
 import clem.project.buzz.utils.toUtf8
 import clem.project.buzz.viewmodels.QuizViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -25,13 +30,15 @@ fun Quiz(
     modifier: Modifier = Modifier,
     categoryId: Int
 ) {
-    val activity: Activity = LocalActivity.current!!
+    val activity: Activity = LocalActivity.current as Activity
+    val dao = remember { AppDatabase.get(activity).scoreDao() }
+    val scope = rememberCoroutineScope()
 
-    val question  by viewModel.questionState.collectAsState()
-    val choices   by viewModel.choicesState .collectAsState()
-    val correct   by viewModel.answerState  .collectAsState()
-    val error     by viewModel.errorState   .collectAsState()
-    val isLoading by viewModel.isLoadingState.collectAsState()
+    val question   by viewModel.questionState   .collectAsState()
+    val choices    by viewModel.choicesState    .collectAsState()
+    val correct    by viewModel.answerState     .collectAsState()
+    val error      by viewModel.errorState      .collectAsState()
+    val isLoading  by viewModel.isLoadingState  .collectAsState()
 
     var questionCount by remember { mutableIntStateOf(1) }
     var selected      by remember { mutableStateOf<String?>(null) }
@@ -39,8 +46,8 @@ fun Quiz(
     var isNextEnabled by remember { mutableStateOf(false) }
     var secondsLeft   by remember { mutableIntStateOf(0) }
     var showDialog    by remember { mutableStateOf(false) }
-
-    var replaySeconds by remember { mutableIntStateOf(5) }
+    var replayTimer   by remember { mutableIntStateOf(5) }
+    var playerName    by remember { mutableStateOf("") }
 
     LaunchedEffect(questionCount) {
         viewModel.getQuestionByCategory(categoryId)
@@ -50,9 +57,7 @@ fun Quiz(
 
     LaunchedEffect(selected) {
         if (selected != null) {
-            if (selected != correct) {
-                showDialog = true
-            }
+            if (selected != correct) showDialog = true
             secondsLeft = 5
             repeat(5) {
                 delay(1_000L)
@@ -64,10 +69,10 @@ fun Quiz(
 
     LaunchedEffect(showDialog) {
         if (showDialog) {
-            replaySeconds = 5
+            replayTimer = 5
             repeat(5) {
                 delay(1_000L)
-                replaySeconds--
+                replayTimer--
             }
         }
     }
@@ -75,7 +80,7 @@ fun Quiz(
     Scaffold(
         topBar = {
             TopAppBar(
-                title          = { Text("Buzz", color = Color.Black) },
+                title = { Text("Buzz", color = Color.Black) },
                 navigationIcon = {
                     IconButton(onClick = { activity.finish() }) {
                         Icon(Icons.Default.ArrowBack, contentDescription = "Retour")
@@ -115,7 +120,7 @@ fun Quiz(
                 Text("Score : $score", style = MaterialTheme.typography.bodyMedium, color = Color.Black)
                 Spacer(Modifier.height(16.dp))
                 Text(
-                    question!!.question.toUtf8(),
+                    text     = question!!.question.toUtf8(),
                     style    = MaterialTheme.typography.bodyLarge,
                     color    = Color.Black,
                     modifier = Modifier.padding(bottom = 16.dp)
@@ -124,7 +129,7 @@ fun Quiz(
                 choices!!.forEach { choice ->
                     val isCorrect = choice == correct
                     val bgColor = when {
-                        selected == null                      -> BWWhite
+                        selected == null                       -> BWWhite
                         isCorrect                              -> Color(0xFF4CAF50)
                         choice == selected && !isCorrect       -> Color(0xFFF44336)
                         else                                   -> BWWhite
@@ -160,29 +165,50 @@ fun Quiz(
                     )
                 }
             }
-
             if (showDialog) {
                 AlertDialog(
                     onDismissRequest = {},
                     title            = { Text("Tu as perdu !", color = Color.Black) },
-                    text             = { Text("Ton score : $score", color = Color.Black) },
-                    confirmButton    = {
-                        TextButton(
-                            onClick = {
-                                showDialog    = false
-                                score          = 0
-                                questionCount++
-                            },
-                            enabled = replaySeconds == 0
-                        ) {
-                            Text(
-                                if (replaySeconds == 0) "Rejouer"
-                                else "Rejouer (${replaySeconds}s)"
+                    text             = {
+                        Column {
+                            Text("Ton score : $score", color = Color.Black)
+                            Spacer(Modifier.height(8.dp))
+                            OutlinedTextField(
+                                value         = playerName,
+                                onValueChange = { playerName = it },
+                                label         = { Text("Ton nom") },
+                                singleLine    = true,
+                                modifier      = Modifier.fillMaxWidth()
                             )
                         }
                     },
-                    dismissButton    = {
-                        TextButton(onClick = { activity.finish() }) {
+                    confirmButton = {
+                        TextButton(
+                            onClick = {
+                                scope.launch(Dispatchers.IO) {
+                                    dao.insert(
+                                        Score(
+                                            playerName = playerName,
+                                            value      = score
+                                        )
+                                    )
+                                }
+                                showDialog = false
+                                activity.finish()
+                            },
+                            enabled = replayTimer == 0 && playerName.isNotBlank()
+                        ) {
+                            Text(
+                                if (replayTimer == 0) "Enregistrer"
+                                else "Enregistrer (${replayTimer}s)"
+                            )
+                        }
+                    },
+                    dismissButton = {
+                        TextButton(onClick = {
+                            showDialog = false
+                            activity.finish()
+                        }) {
                             Text("Menu principal")
                         }
                     }

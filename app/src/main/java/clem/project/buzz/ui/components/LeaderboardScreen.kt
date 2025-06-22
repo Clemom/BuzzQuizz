@@ -1,3 +1,4 @@
+// LeaderboardScreen.kt
 package clem.project.buzz.ui.components
 
 import android.app.Activity
@@ -21,8 +22,7 @@ import java.text.DateFormat
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LeaderboardScreen(vm: LeaderboardViewModel) {
-    val activity: Activity = LocalActivity.current!!
-
+    val activity: Activity = LocalActivity.current as Activity
     val scores by vm.topScores.collectAsState()
 
     Scaffold(
@@ -35,9 +35,9 @@ fun LeaderboardScreen(vm: LeaderboardViewModel) {
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.background,
+                    containerColor             = MaterialTheme.colorScheme.background,
                     navigationIconContentColor = MaterialTheme.colorScheme.onBackground,
-                    titleContentColor = MaterialTheme.colorScheme.onBackground
+                    titleContentColor          = MaterialTheme.colorScheme.onBackground
                 )
             )
         },
@@ -51,27 +51,29 @@ fun LeaderboardScreen(vm: LeaderboardViewModel) {
                 ) {
                     Text("Aucun score enregistré", style = MaterialTheme.typography.bodyLarge)
                 }
-
             } else {
                 LazyColumn(
                     modifier = Modifier
                         .fillMaxSize()
                         .padding(padding)
-                        .padding(horizontal = 16.dp, vertical = 8.dp),
+                        .padding(horizontal = 16.dp),
                     verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
                     items(scores) { score: Score ->
                         Card(
-                            modifier = Modifier.fillMaxWidth(),
+                            modifier  = Modifier.fillMaxWidth(),
                             elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
                         ) {
                             Row(
-                                modifier = Modifier
+                                modifier            = Modifier
                                     .fillMaxWidth()
                                     .padding(12.dp),
                                 horizontalArrangement = Arrangement.SpaceBetween
                             ) {
-                                Text("Score : ${score.value}", style = MaterialTheme.typography.bodyMedium)
+                                Column {
+                                    Text(score.playerName, style = MaterialTheme.typography.bodyLarge)
+                                    Text("Score : ${score.value}", style = MaterialTheme.typography.bodyMedium)
+                                }
                                 Text(
                                     DateFormat.getDateTimeInstance().format(score.timestamp),
                                     style = MaterialTheme.typography.bodySmall
