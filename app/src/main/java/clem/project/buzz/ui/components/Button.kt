@@ -1,6 +1,5 @@
 package clem.project.buzz.ui.components
 
-import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -17,9 +16,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -29,37 +28,25 @@ fun BaseButton(
     text: String,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
-    gradientColors: List<Color> = listOf(
-        MaterialTheme.colorScheme.primary,
-        MaterialTheme.colorScheme.secondary
-    ),
-    textColor: Color = MaterialTheme.colorScheme.onPrimary,
     cornerRadius: Dp = 12.dp,
-    elevation: Dp = 6.dp,
-    verticalPadding: Dp = 14.dp,
+    elevation: Dp = 4.dp,
+    verticalPadding: Dp = 12.dp,
     onClick: () -> Unit
 ) {
     val interactionSource = remember { MutableInteractionSource() }
     val isPressed = interactionSource.collectIsPressedAsState().value
-    val scale = animateFloatAsState(if (isPressed) 0.97f else 1f).value
+    val alphaPress = if (isPressed) 0.85f else 1f
 
     Box(
         modifier = modifier
-            .graphicsLayer {
-                scaleX = scale
-                scaleY = scale
-            }
-            .shadow(
-                elevation = elevation,
-                shape = RoundedCornerShape(cornerRadius),
-                clip = false
-            )
-            .background(
-                brush = Brush.horizontalGradient(gradientColors),
-                shape = RoundedCornerShape(cornerRadius)
-            )
             .fillMaxWidth()
             .padding(vertical = verticalPadding)
+            .alpha(if (enabled) alphaPress else 0.5f)
+            .shadow(elevation, RoundedCornerShape(cornerRadius), clip = false)
+            .background(
+                color = MaterialTheme.colorScheme.surface,
+                shape = RoundedCornerShape(cornerRadius)
+            )
             .clickable(
                 enabled = enabled,
                 interactionSource = interactionSource,
@@ -70,7 +57,7 @@ fun BaseButton(
     ) {
         Text(
             text = text,
-            color = textColor,
+            color = MaterialTheme.colorScheme.onSurface,
             fontSize = 16.sp
         )
     }

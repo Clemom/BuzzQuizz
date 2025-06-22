@@ -1,13 +1,15 @@
 package clem.project.buzz.ui.components
 
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -23,7 +25,6 @@ fun <T> BaseDropdown(
     var expanded by remember { mutableStateOf(false) }
     var query by remember { mutableStateOf("") }
 
-    // Filtre selon la saisie
     val filtered = remember(query, options) {
         if (query.isBlank()) options
         else options.filter { toString(it).contains(query, ignoreCase = true) }
@@ -34,7 +35,6 @@ fun <T> BaseDropdown(
         onExpandedChange = { expanded = !expanded },
         modifier = modifier.fillMaxWidth()
     ) {
-        // Champ texte éditable + icônes
         OutlinedTextField(
             value = if (expanded) query else selectedOption?.let(toString) ?: "",
             onValueChange = {
@@ -46,24 +46,24 @@ fun <T> BaseDropdown(
                 .menuAnchor(),
             label = { Text(label) },
             leadingIcon = { Icon(Icons.Default.Search, contentDescription = null) },
-            trailingIcon = {
-                ExposedDropdownMenuDefaults.TrailingIcon(expanded)
-            },
-            colors = ExposedDropdownMenuDefaults.outlinedTextFieldColors(),
+            trailingIcon = { Icon(Icons.Default.ArrowDropDown, contentDescription = null) },
+            colors = ExposedDropdownMenuDefaults.outlinedTextFieldColors(
+                focusedBorderColor   = Color.Black,
+                unfocusedBorderColor = Color.Black,
+                disabledBorderColor  = Color.Gray
+            ),
+            shape = RoundedCornerShape(8.dp),
             singleLine = true
         )
 
-        // Menu déroulant standard Material3
         ExposedDropdownMenu(
             expanded = expanded,
             onDismissRequest = { expanded = false },
-            modifier = Modifier
-                .fillMaxWidth()
-                .heightIn(max = 200.dp)
+            modifier = Modifier.fillMaxWidth().heightIn(max = 200.dp)
         ) {
             filtered.forEach { option ->
                 DropdownMenuItem(
-                    text = { Text(toString(option)) },
+                    text = { Text(toString(option), color = Color.Black) },
                     onClick = {
                         onOptionSelect(option)
                         query = toString(option)
