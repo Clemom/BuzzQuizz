@@ -23,6 +23,7 @@ import clem.project.buzz.utils.switchActivity
 import clem.project.buzz.viewmodels.HomeViewModel
 import clem.project.buzz.ui.theme.BWWhite
 import androidx.compose.material.icons.filled.EmojiEvents
+import clem.project.buzz.ui.views.LeaderboardActivity
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -42,9 +43,12 @@ fun Home(viewModel: HomeViewModel) {
                     }
                 },
                 actions = {
-                    IconButton(onClick = {}) {
-                        Icon(Icons.Filled.EmojiEvents, contentDescription = null)
+                    IconButton(onClick = {
+                        switchActivity(context, LeaderboardActivity::class.java)
+                    }) {
+                        Icon(Icons.Default.EmojiEvents, contentDescription = "Leaderboard")
                     }
+
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor             = BWWhite,

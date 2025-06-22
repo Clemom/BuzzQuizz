@@ -28,6 +28,8 @@
         <activity
             android:name=".ui.views.QuizActivity"
             android:theme="@style/Theme.Buzz" />
+        <activity android:name=".ui.views.LeaderboardActivity" />
+
 
     </application>
 
